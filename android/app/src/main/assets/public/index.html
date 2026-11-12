@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Smart Diary</title>
+
+    <meta name="theme-color" content="#1d4ed8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- AdMob Official Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-6755737504750546" crossorigin="anonymous"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        #noteTitle, #noteContent, #searchQuery, #pinInputField {
+            user-select: text !important;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 4px; }
+
+        .notebook-texture-light {
+            background-image: linear-gradient(rgba(226, 232, 240, 0.7) 1px, transparent 1px);
+            background-size: 100% 2.3rem;
+            line-height: 2.3rem;
+        }
+        .notebook-texture-dark {
+            background-image: linear-gradient(rgba(51, 65, 85, 0.7) 1px, transparent 1px);
+            background-size: 100% 2.3rem;
+            line-height: 2.3rem;
+        }
+        .notebook-texture-sepia {
+            background-image: linear-gradient(rgba(214, 180, 140, 0.4) 1px, transparent 1px);
+            background-size: 100% 2.3rem;
+            line-height: 2.3rem;
+        }
+
+        /* 100% PERMANENT INVISIBLE SHIELD: NETLIFY BADGE ELIMINATION */
+        iframe[src*="netlify"],
+        div[class*="netlify"],
+        div[id*="netlify"],
+        a[href*="netlify.com"],
+        .netlify-badge,
+        [data-netlify-badge],
+        #netlify-badge,
+        .__netlify_badge,
+        div:has(> a[href*="netlify.com"]),
+        div:has(> iframe[src*="netlify"]),
+        [class*="feedback-modal"],
+        [class*="drawer-feedback"],
+        #feedback-drawer,
+        div[style*="z-index: 2147483647"],
+        div[style*="z-index: 9999999"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            position: absolute !important;
+            left: -99999px !important;
+            top: -99999px !important;
+            z-index: -99999 !important;
+        }
+    </style>
+</head>
+<body id="appBody" class="bg-slate-950 text-slate-800 font-sans min-h-screen flex justify-center transition-colors duration-300">
+
+    <!-- MAIN WRAPPER SHELL -->
+    <div id="mainAppShell" class="w-full max-w-md bg-white min-h-screen flex flex-col relative shadow-2xl overflow-hidden transition-colors duration-300">
+
+        <!-- Top Header Bar -->
+        <header id="appHeader" class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-30">
+            <div class="flex items-center gap-2.5">
+                <button onclick="openSideDrawer()" class="p-1.5 text-2xl text-blue-100 hover:text-white active:scale-90 transition rounded-lg" title="Menu">
+                    <i class="ph-bold ph-list"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-lg text-white shadow-inner">
+                        <i class="ph-fill ph-book-bookmark"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-base font-extrabold tracking-wide leading-tight">Smart Diary</h1>
+                        <p class="text-[10px] text-blue-100 font-medium" id="headerSub">Notes & Personal Diary</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Theme Switcher -->
+                <button onclick="cycleTheme()" class="bg-white/15 hover:bg-white/25 text-white text-xs px-2.5 py-1.5 rounded-lg border border-white/20 flex items-center gap-1.5 active:scale-95 transition font-semibold">
+                    <i class="ph-bold ph-palette text-sm"></i>
+                    <span id="themeNameText" class="text-[11px]">Classic</span>
+                </button>
+
+                <!-- Vault Lock Icon -->
+                <button onclick="openPinModal()" class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center text-white active:scale-90 transition" title="Security PIN">
+                    <i id="headerLockIcon" class="ph-bold ph-lock-key-open text-base"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Category & Font Size Bar -->
+        <div id="controlsBar" class="px-3.5 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-semibold gap-2 transition-colors duration-300">
+            <div class="flex gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+                <button onclick="setCategory('General')" class="cat-pill px-3 py-1 rounded-full bg-blue-600 text-white shadow-xs text-xs font-semibold" data-cat="General">
+                    <span id="catGeneralText">General</span>
+                </button>
+                <button onclick="setCategory('Stories')" class="cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 text-xs font-semibold" data-cat="Stories">
+                    <span id="catStoriesText">Stories</span>
+                </button>
+                <button onclick="setCategory('Important')" class="cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 text-xs font-semibold" data-cat="Important">
+                    <span id="catImportantText">Important</span>
+                </button>
+                <button onclick="setCategory('Personal')" class="cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 flex items-center gap-1 text-xs font-semibold" data-cat="Personal">
+                    <span id="catPersonalText">Personal</span>
+                    <i class="ph-bold ph-lock text-[10px] text-amber-500"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-1.5 py-0.5 shrink-0 shadow-xs">
+                <button onclick="changeFontSize(-1)" class="px-1 text-slate-500 hover:text-blue-600 font-black active:scale-75" title="Decrease Font">A-</button>
+                <span id="fontSizeDisplay" class="text-[11px] font-mono text-slate-600 font-bold px-0.5">16</span>
+                <button onclick="changeFontSize(1)" class="px-1 text-slate-500 hover:text-blue-600 font-black active:scale-75" title="Increase Font">A+</button>
+            </div>
+        </div>
+
+        <!-- Main Notepad Canvas -->
+        <main class="flex-1 p-3 flex flex-col space-y-2.5 overflow-hidden">
+
+            <div id="editorBox" class="flex-1 bg-white rounded-2xl p-3.5 shadow-xs border border-slate-200 flex flex-col relative transition-all duration-300">
+                
+                <div id="editingBanner" class="hidden mb-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs text-amber-800 font-medium shrink-0">
+                    <span class="flex items-center gap-1.5">
+                        <i class="ph-bold ph-pencil-simple-line text-amber-600"></i>
+                        <span id="editingBannerText">Editing Note</span>
+                    </span>
+                    <button onclick="cancelEditing()" class="text-amber-700 hover:text-rose-600 font-bold underline text-[11px]">Cancel</button>
+                </div>
+
+                <input 
+                    type="text" 
+                    id="noteTitle" 
+                    placeholder="Story or Note Title..." 
+                    class="w-full font-extrabold text-slate-800 text-base md:text-lg border-b border-slate-200 pb-2 mb-2 outline-none focus:border-blue-500 placeholder:text-slate-400 placeholder:font-normal bg-transparent transition"
+                />
+
+                <div class="flex-1 w-full overflow-hidden flex flex-col">
+                    <textarea 
+                        id="noteContent" 
+                        placeholder="Write your story or notes freely here... (auto-saved securely)" 
+                        class="flex-1 w-full text-slate-800 text-base outline-none resize-none placeholder:text-slate-400 notebook-texture-light bg-transparent font-normal leading-relaxed overflow-y-auto"
+                    ></textarea>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-medium shrink-0">
+                    <span id="charCount">0 characters • 0 words</span>
+                    <div class="flex items-center gap-3">
+                        <button onclick="clearCurrentEditor()" class="hover:text-rose-500 flex items-center gap-1 transition" title="Clear">
+                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                            <span id="clearBtnText">New</span>
+                        </button>
+                        <button onclick="openSavedNotesModal()" class="text-blue-600 hover:underline font-bold flex items-center gap-1" title="Vault">
+                            <i class="ph-bold ph-folder-open"></i>
+                            <span id="openVaultBtnText">Saved Notes (<span id="savedCountMini">0</span>)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button 
+                    id="saveNoteBtn"
+                    onclick="saveOrUpdateNote()" 
+                    class="w-full mt-2.5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition shrink-0"
+                >
+                    <i class="ph-bold ph-floppy-disk text-lg"></i>
+                    <span id="saveBtnText">Save Note</span>
+                </button>
+            </div>
+
+            <!-- AdMob Dedicated Placement Unit -->
+            <div id="adContainerBox" class="w-full min-h-[50px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden flex flex-col items-center justify-center text-center p-1 shrink-0 transition-colors duration-300">
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:320px;height:50px"
+                     data-ad-client="ca-app-pub-6755737504750546"
+                     data-ad-slot="4680009749"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+                <div class="text-[9px] text-slate-400 mt-0.5 flex items-center gap-1">
+                    <i class="ph-bold ph-google-logo text-blue-500"></i>
+                    <span>Smart Diary Sponsor • AdMob</span>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Saved Notes Modal Drawer -->
+        <div id="savedNotesModal" class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center hidden">
+            <div class="bg-white w-full max-w-md h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-2xl p-4 flex flex-col shadow-2xl space-y-3">
+                
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100 shrink-0">
+                    <div class="flex items-center gap-2">
+                        <i class="ph-bold ph-books text-blue-600 text-xl"></i>
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-800" id="savedModalHeading">Saved Notes & Stories</h3>
+                            <p class="text-[10px] text-slate-400" id="savedModalSub">Tap to edit, share on WhatsApp or delete</p>
+                        </div>
+                    </div>
+                    <button onclick="closeSavedNotesModal()" class="p-1.5 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full">
+                        <i class="ph-bold ph-x text-base"></i>
+                    </button>
+                </div>
+
+                <div class="relative shrink-0">
+                    <i class="ph-bold ph-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                    <input 
+                        type="text" 
+                        id="searchQuery" 
+                        oninput="renderNotes()" 
+                        placeholder="Search notes & stories..." 
+                        class="w-full bg-slate-50 text-slate-700 text-xs pl-8 pr-3 py-2 rounded-xl border border-slate-200 outline-none focus:border-blue-500 transition"
+                    />
+                </div>
+
+                <div id="notesList" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+
+                <button onclick="closeSavedNotesModal()" id="closeSavedModalBtn" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl shrink-0 transition">
+                    Back to Notepad
+                </button>
+            </div>
+        </div>
+
+        <!-- Side Settings Menu (☰) -->
+        <div id="sideDrawer" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 opacity-0 pointer-events-none">
+            <div id="drawerPanel" class="w-72 bg-white h-full p-4 flex flex-col justify-between border-r border-slate-200 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out">
+                <div>
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl font-bold shadow-sm shadow-blue-500/30">
+                                <i class="ph-fill ph-book-bookmark"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800 leading-tight">Smart Diary</h3>
+                                <p class="text-[10px] text-slate-500 font-medium" id="drawerSettingsLabel">Settings & Storage</p>
+                            </div>
+                        </div>
+                        <button onclick="closeSideDrawer()" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg">
+                            <i class="ph-bold ph-x text-base"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5 mt-3 text-xs font-semibold text-slate-700">
+                        
+                        <!-- Saved Notes Option -->
+                        <button onclick="closeSideDrawer(); openSavedNotesModal();" class="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 text-blue-700 transition">
+                            <div class="flex items-center gap-2.5">
+                                <i class="ph-bold ph-folder-open text-base"></i>
+                                <span id="menuViewNotesText">Saved Notes & Stories</span>
+                            </div>
+                            <span id="drawerNotesCount" class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">0</span>
+                        </button>
+
+                        <!-- Theme Switcher -->
+                        <button onclick="cycleTheme()" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-2.5">
+                                <i class="ph-bold ph-palette text-base text-indigo-600"></i>
+                                <span id="menuThemeText">Color Theme</span>
+                            </div>
+                            <span id="drawerThemeName" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">Classic</span>
+                        </button>
+
+                        <!-- PIN Security -->
+                        <button onclick="openPinModal(); closeSideDrawer();" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
+                            <div class="flex items-center gap-2.5">
+                                <i class="ph-bold ph-lock-key text-base text-blue-600"></i>
+                                <span id="menuPinText">Security PIN Lock</span>
+                            </div>
+                            <span id="drawerPinStatus" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono">OFF</span>
+                        </button>
+
+                        <!-- Backup Option -->
+                        <button onclick="backupNotes(); closeSideDrawer();" class="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 transition">
+                            <i class="ph-bold ph-download-simple text-base text-emerald-600"></i>
+                            <div>
+                                <span id="menuBackupText">Download Backup</span>
+                                <p class="text-[9px] text-slate-400 font-normal" id="menuBackupSub">Save securely on device</p>
+                            </div>
+                        </button>
+
+                        <!-- Restore Option -->
+                        <label class="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 transition cursor-pointer">
+                            <i class="ph-bold ph-upload-simple text-base text-indigo-600"></i>
+                            <span id="menuRestoreText">Restore Backup File</span>
+                            <input type="file" id="restoreFileInput" accept=".json" onchange="restoreNotes(event)" class="hidden">
+                        </label>
+
+                        <div class="my-1.5 border-t border-slate-100"></div>
+
+                        <!-- MULTI-LANGUAGE SELECTOR (Inside Settings) -->
+                        <div class="px-2.5 py-1.5 bg-slate-50 rounded-xl border border-slate-200">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-slate-600 font-bold text-[11px] flex items-center gap-1">
+                                    <i class="ph-bold ph-translate text-blue-600"></i>
+                                    <span id="menuLanguageLabel">Language</span>
+                                </span>
+                            </div>
+                            <select id="languageSelect" onchange="changeLanguage(this.value)" class="w-full bg-white text-slate-800 text-xs font-semibold p-1.5 rounded-lg border border-slate-200 outline-none focus:border-blue-500">
+                                <option value="en">English</option>
+                                <option value="te">తెలుగు (Telugu)</option>
+                                <option value="hi">हिन्दी (Hindi)</option>
+                                <option value="ta">தமிழ் (Tamil)</option>
+                                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                            </select>
+                        </div>
+
+                        <!-- Clear All Notes Option -->
+                        <button onclick="clearAllData()" class="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-rose-50 text-rose-600 transition mt-1">
+                            <i class="ph-bold ph-trash text-base"></i>
+                            <span id="menuClearAllText">Delete All Notes</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 text-center text-xs text-slate-400 space-y-0.5">
+                    <p class="font-bold text-slate-600">Smart Diary Pro</p>
+                    <p class="text-[10px]" id="drawerFooterText">100% Offline • Private & Secure</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom PIN Modal -->
+        <div id="pinModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl w-full max-w-xs p-4 shadow-2xl text-center space-y-3">
+                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl mx-auto">
+                    <i class="ph-bold ph-shield-check"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800" id="pinModalHeading">Security PIN</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5" id="pinModalSub">Enter 4-digit secret PIN</p>
+                </div>
+                <input 
+                    type="password" 
+                    id="pinInputField" 
+                    maxlength="4" 
+                    placeholder="••••" 
+                    class="w-32 mx-auto text-center tracking-[0.5em] text-xl font-bold py-1.5 border-b-2 border-blue-600 outline-none"
+                />
+                <div class="flex gap-2 pt-1">
+                    <button onclick="closePinModal()" id="pinCancelBtn" class="flex-1 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-semibold hover:bg-slate-200">
+                        Cancel
+                    </button>
+                    <button onclick="submitPinModal()" id="pinConfirmBtn" class="flex-1 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interstitial Ad Trigger Unit -->
+        <div id="interstitialModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl w-full max-w-xs p-4 shadow-2xl text-center space-y-3 relative">
+                <button onclick="closeInterstitialAd()" class="absolute top-2.5 right-2.5 text-slate-400 hover:text-slate-700 p-1 rounded-full bg-slate-100">
+                    <i class="ph-bold ph-x text-xs"></i>
+                </button>
+                <div class="text-[9px] uppercase tracking-wider text-slate-400 font-bold" id="adSponsoredLabel">Sponsored Ad</div>
+                <div class="h-40 bg-slate-50 rounded-xl flex flex-col items-center justify-center p-3 border border-dashed border-slate-300">
+                    <i class="ph-bold ph-sparkle text-3xl text-indigo-500 mb-1"></i>
+                    <p class="text-xs font-bold text-slate-700">Smart Diary Pro Features</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Google AdMob Interstitial Slot: ca-app-pub-6755737504750546/9803297732</p>
+                </div>
+                <button onclick="closeInterstitialAd()" id="adContinueBtn" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition">
+                    Continue to Smart Diary
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Application Script Engine (Immediate Execution) -->
+    <script>
+        const STORAGE_KEY = 'smart_diary_user_notes';
+        const PIN_KEY = 'smart_diary_security_pin';
+        const LANG_KEY = 'smart_diary_language';
+        const THEME_KEY = 'smart_diary_active_theme';
+        const FONT_SIZE_KEY = 'smart_diary_font_size';
+        const SAVE_COUNT_KEY = 'smart_diary_save_action_counter';
+
+        const i18n = {
+            en: {
+                headerSub: "Notes & Personal Diary",
+                catGeneral: "General",
+                catStories: "Stories",
+                catImportant: "Important",
+                catPersonal: "Personal",
+                titlePlaceholder: "Story or Note Title...",
+                contentPlaceholder: "Write your story or notes freely here... (auto-saved securely)",
+                saveBtn: "Save Note",
+                updateBtn: "Update Note",
+                newBtn: "New",
+                savedVaultBtn: "Saved Notes",
+                charsWords: "characters • {words} words",
+                savedHeading: "Saved Notes & Stories",
+                savedSub: "Tap to edit, share on WhatsApp or delete",
+                searchPlaceholder: "Search notes & stories...",
+                closeModalBtn: "Back to Notepad",
+                drawerSettings: "Settings & Storage",
+                menuSaved: "Saved Notes & Stories",
+                menuTheme: "Color Theme",
+                menuPin: "Security PIN Lock",
+                menuBackup: "Download Backup",
+                menuBackupSub: "Save securely on device",
+                menuRestore: "Restore Backup File",
+                menuLanguage: "Language",
+                menuClearAll: "Delete All Notes",
+                drawerFooter: "100% Offline • Private & Secure",
+                editTag: "Editing Note",
+                editBtn: "Edit",
+                noNotes: "No notes saved yet.",
+                pinSetHeading: "Set Security PIN",
+                pinSetSub: "Choose a 4-digit secret code",
+                pinEnterHeading: "Unlock Secret Vault",
+                pinEnterSub: "Enter your 4-digit PIN",
+                cancel: "Cancel",
+                confirm: "Confirm",
+                deleteConfirm: "Are you sure you want to delete all notes?",
+                adContinue: "Continue to Smart Diary",
+                adSponsored: "Sponsored Ad"
+            },
+            te: {
+                headerSub: "నోట్స్ & పర్సనల్ డైరీ",
+                catGeneral: "సాధారణం",
+                catStories: "కథలు",
+                catImportant: "ముఖ్యమైనవి",
+                catPersonal: "వ్యక్తిగతం",
+                titlePlaceholder: "నోట్ లేదా కథ శీర్షిక...",
+                contentPlaceholder: "ఇక్కడ వివరాలు లేదా మీ కథను విశాలంగా రాసుకోండి... (భద్రంగా సేవ్ అవుతుంది)",
+                saveBtn: "సేవ్ చేయండి",
+                updateBtn: "అప్‌డేట్ చేయండి",
+                newBtn: "కొత్తది",
+                savedVaultBtn: "సేవ్ చేసినవి",
+                charsWords: "అక్షరాలు • {words} పదాలు",
+                savedHeading: "భద్రపరిచిన కథలు & నోట్స్",
+                savedSub: "ఎడిట్, వాట్సాప్ షేర్ లేదా డిలీట్ చేసుకోవచ్చు",
+                searchPlaceholder: "నోట్స్ / కథలలో వెతకండి...",
+                closeModalBtn: "తిరిగి నోట్‌ప్యాడ్‌కు రండి",
+                drawerSettings: "సెట్టింగ్స్ & స్టోరేజ్",
+                menuSaved: "భద్రపరిచిన కథలు & నోట్స్",
+                menuTheme: "రంగుల థీమ్ (Theme)",
+                menuPin: "సెక్యూరిటీ పిన్ లాక్",
+                menuBackup: "నోట్స్ డౌన్‌లోడ్ (Backup)",
+                menuBackupSub: "ఫోన్/పీసీలో భద్రంగా సేవ్ అవుతుంది",
+                menuRestore: "బ్యాకప్ ఫైల్ రీస్టోర్",
+                menuLanguage: "భాష (Language)",
+                menuClearAll: "అన్ని నోట్స్ డిలీట్ చేయండి",
+                drawerFooter: "100% ఆఫ్‌లైన్ • పూర్తి భద్రం & ప్రైవేట్",
+                editTag: "ఎడిట్ చేస్తున్నారు",
+                editBtn: "ఎడిట్",
+                noNotes: "కథలు లేదా నోట్స్ ఏవీ లేవు.",
+                pinSetHeading: "కొత్త పిన్ సెట్ చేయండి",
+                pinSetSub: "4 అంకెల సీక్రెట్ కోడ్ ఎంచుకోండి",
+                pinEnterHeading: "పిన్ లాక్ తెరవండి",
+                pinEnterSub: "మీ 4 అంకెల పిన్ నమోదు చేయండి",
+                cancel: "రద్దు",
+                confirm: "నిర్ధారించండి",
+                deleteConfirm: "మీ కథలు, నోట్స్ అన్నీ పూర్తిగా డిలీట్ చేయమంటారా?",
+                adContinue: "డైరీకి కొనసాగండి",
+                adSponsored: "ప్రకటన (Ad)"
+            },
+            hi: {
+                headerSub: "नोट्स और व्यक्तिगत डायरी",
+                catGeneral: "सामान्य",
+                catStories: "कहानियाँ",
+                catImportant: "महत्वपूर्ण",
+                catPersonal: "व्यक्तिगत",
+                titlePlaceholder: "कहानी या नोट का शीर्षक...",
+                contentPlaceholder: "यहाँ अपने विचार या कहानी लिखें... (सुरक्षित रूप से सहेजा गया)",
+                saveBtn: "नोट सहेजें",
+                updateBtn: "अपडेट करें",
+                newBtn: "नया",
+                savedVaultBtn: "सहेजे गए नोट्स",
+                charsWords: "अक्षर • {words} शब्द",
+                savedHeading: "सहेजे गए नोट्स और कहानियाँ",
+                savedSub: "संपादित करने, साझा करने या हटाने के लिए टैप करें",
+                searchPlaceholder: "नोट्स या कहानियाँ खोजें...",
+                closeModalBtn: "नोटपैड पर वापस जाएँ",
+                drawerSettings: "सेटिंग्स और स्टोरेज",
+                menuSaved: "सहेजे गए नोट्स और कहानियाँ",
+                menuTheme: "रंग थीम (Theme)",
+                menuPin: "सुरक्षा पिन लॉक",
+                menuBackup: "बैकअप डाउनलोड करें",
+                menuBackupSub: "डिवाइस पर सुरक्षित रूप से सहेजें",
+                menuRestore: "बैकअप फ़ाइल पुनर्स्थापित करें",
+                menuLanguage: "भाषा (Language)",
+                menuClearAll: "सभी नोट्स हटाएँ",
+                drawerFooter: "100% ऑफ़लाइन • निजी और सुरक्षित",
+                editTag: "संपादित कर रहे हैं",
+                editBtn: "संपादित करें",
+                noNotes: "कोई नोट सहेजा नहीं गया है।",
+                pinSetHeading: "सुरक्षा पिन सेट करें",
+                pinSetSub: "4-अंकीय गुप्त कोड चुनें",
+                pinEnterHeading: "गुप्त वॉल्ट अनलॉक करें",
+                pinEnterSub: "अपना 4-अंकीय पिन दर्ज करें",
+                cancel: "रद्द करें",
+                confirm: "पुष्टि करें",
+                deleteConfirm: "क्या आप वाकई सभी नोट्स हटाना चाहते हैं?",
+                adContinue: "डायरी पर जारी रखें",
+                adSponsored: "प्रायोजित विज्ञापन"
+            },
+            ta: {
+                headerSub: "குறிப்புகள் மற்றும் தனிப்பட்ட டைரி",
+                catGeneral: "பொது",
+                catStories: "கதைகள்",
+                catImportant: "முக்கியமானவை",
+                catPersonal: "தனிப்பட்டவை",
+                titlePlaceholder: "தலைப்பு...",
+                contentPlaceholder: "உங்கள் குறிப்புகளை இங்கே தாராளமாக எழுதுங்கள்...",
+                saveBtn: "சேமிக்கவும்",
+                updateBtn: "புதுப்பிக்கவும்",
+                newBtn: "புதியது",
+                savedVaultBtn: "சேமிக்கப்பட்டவை",
+                charsWords: "எழுத்துக்கள் • {words} சொற்கள்",
+                savedHeading: "சேமிக்கப்பட்ட குறிப்புகள்",
+                savedSub: "திருத்த, பகிர அல்லது நீக்க தட்டவும்",
+                searchPlaceholder: "குறிப்புகளைத் தேடுங்கள்...",
+                closeModalBtn: "மீண்டும் செல்லவும்",
+                drawerSettings: "அமைப்புகள் & சேமிப்பு",
+                menuSaved: "சேமிக்கப்பட்ட குறிப்புகள்",
+                menuTheme: "வண்ண தீம் (Theme)",
+                menuPin: "பாதுகாப்பு பின் லாக்",
+                menuBackup: "காப்புப்பிரதியை பதிவிறக்குங்கள்",
+                menuBackupSub: "பாதுகாப்பாக சேமிக்கவும்",
+                menuRestore: "மீட்டமைக்கவும்",
+                menuLanguage: "மொழி (Language)",
+                menuClearAll: "அனைத்தையும் நீக்கு",
+                drawerFooter: "100% ஆஃப்லைன் • பாதுகாப்பானது",
+                editTag: "திருத்துகிறீர்கள்",
+                editBtn: "திருத்து",
+                noNotes: "குறிப்புகள் எதுவும் இல்லை.",
+                pinSetHeading: "பின்னை அமைக்கவும்",
+                pinSetSub: "4 இலக்க ரகசிய பின்னைத் தேர்ந்தெடுக்கவும்",
+                pinEnterHeading: "பூட்டைத் திறக்கவும்",
+                pinEnterSub: "உங்கள் 4 இலக்க பின்னை உள்ளிடவும்",
+                cancel: "ரத்து செய்",
+                confirm: "உறுதிப்படுத்து",
+                deleteConfirm: "அனைத்து குறிப்புகளையும் நிச்சயமாக நீக்க விரும்புகிறீர்களா?",
+                adContinue: "தொடரவும்",
+                adSponsored: "விளம்பரம்"
+            },
+            kn: {
+                headerSub: "ಟಿಪ್ಪಣಿಗಳು & ವೈಯಕ್ತಿಕ ಡೈರಿ",
+                catGeneral: "ಸಾಮಾನ್ಯ",
+                catStories: "ಕಥೆಗಳು",
+                catImportant: "ಪ್ರಮುಖ",
+                catPersonal: "ವೈಯಕ್ತಿಕ",
+                titlePlaceholder: "ಶೀರ್ಷಿಕೆ...",
+                contentPlaceholder: "ನಿಮ್ಮ ಆಲೋಚನೆಗಳನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ...",
+                saveBtn: "ಉಳಿಸಿ",
+                updateBtn: "ಅಪ್ಡೇಟ್ ಮಾಡಿ",
+                newBtn: "ಹೊಸತು",
+                savedVaultBtn: "ಉಳಿಸಿದ ಟಿಪ್ಪಣಿಗಳು",
+                charsWords: "ಅಕ್ಷರಗಳು • {words} ಪದಗಳು",
+                savedHeading: "ಉಳಿಸಿದ ಟಿಪ್ಪಣಿಗಳು & ಕಥೆಗಳು",
+                savedSub: "ತಿದ್ದುಪಡಿ ಮಾಡಲು, ಹಂಚಿಕೊಳ್ಳಲು ಟ್ಯಾಪ್ ಮಾಡಿ",
+                searchPlaceholder: "ಹುಡುಕಿ...",
+                closeModalBtn: "ಹಿಂದಕ್ಕೆ ಹೋಗಿ",
+                drawerSettings: "ಸೆಟ್ಟಿಂಗ್ಸ್ & ಸಂಗ್ರಹಣೆ",
+                menuSaved: "ಉಳಿಸಿದ ಟಿಪ್ಪಣಿಗಳು",
+                menuTheme: "ಬಣ್ಣದ ಥೀಮ್ (Theme)",
+                menuPin: "ಸೆಕ್ಯುರಿಟಿ ಪಿನ್ ಲಾಕ್",
+                menuBackup: "ಬ್ಯಾಕಪ್ ಡೌನ್‌ಲೋಡ್",
+                menuBackupSub: "ಸುರಕ್ಷಿತವಾಗಿ ಉಳಿಸಿ",
+                menuRestore: "ರಿಸ್ಟೋರ್ ಮಾಡಿ",
+                menuLanguage: "ಭಾಷೆ (Language)",
+                menuClearAll: "ಎಲ್ಲವನ್ನೂ ಅಳಿಸಿ",
+                drawerFooter: "100% ಆಫ್‌ಲೈನ್ • ಸುರಕ್ಷಿತ",
+                editTag: "ತಿದ್ದುಪಡಿ ಮಾಡುತ್ತಿದ್ದೀರಿ",
+                editBtn: "ಎಡಿಟ್",
+                noNotes: "ಯಾವುದೇ ಟಿಪ್ಪಣಿಗಳು ಇಲ್ಲ.",
+                pinSetHeading: "ಪಿನ್ ಹೊಂದಿಸಿ",
+                pinSetSub: "4 ಅಂಕಿಯ ಪಿನ್ ಆಯ್ಕೆಮಾಡಿ",
+                pinEnterHeading: "ಲಾಕ್ ತೆರೆಯಿರಿ",
+                pinEnterSub: "ನಿಮ್ಮ 4 ಅಂಕಿಯ ಪಿನ್ ನಮೂದಿಸಿ",
+                cancel: "ರದ್ದುಮಾಡಿ",
+                confirm: "ಖಚಿತಪಡಿಸಿ",
+                deleteConfirm: "ಎಲ್ಲಾ ಟಿಪ್ಪಣಿಗಳನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?",
+                adContinue: "ಮುಂದುವರಿಸಿ",
+                adSponsored: "ಜಾಹೀರಾತು"
+            }
+        };
+
+        const themes = [
+            { id: 'classic', name: 'Classic Blue', headerBg: 'from-blue-700 via-indigo-700 to-blue-800', appBg: 'bg-white', textClass: 'text-slate-800', borderClass: 'border-slate-200', editorBg: 'bg-white', texture: 'notebook-texture-light', bodyBg: 'bg-slate-950', controlsBg: 'bg-slate-50' },
+            { id: 'dark', name: 'Velvet Dark', headerBg: 'from-slate-900 via-zinc-900 to-black', appBg: 'bg-slate-900', textClass: 'text-slate-100', borderClass: 'border-slate-700', editorBg: 'bg-slate-800/90', texture: 'notebook-texture-dark', bodyBg: 'bg-black', controlsBg: 'bg-slate-800' },
+            { id: 'sepia', name: 'Warm Cream', headerBg: 'from-amber-800 via-yellow-900 to-stone-900', appBg: 'bg-[#fbf7ee]', textClass: 'text-stone-900', borderClass: 'border-amber-200', editorBg: 'bg-[#fffdf7]', texture: 'notebook-texture-sepia', bodyBg: 'bg-stone-950', controlsBg: 'bg-[#f4ede0]' },
+            { id: 'mint', name: 'Elegant Mint', headerBg: 'from-teal-700 via-emerald-800 to-teal-900', appBg: 'bg-[#f0fdf4]', textClass: 'text-emerald-950', borderClass: 'border-emerald-200', editorBg: 'bg-white', texture: 'notebook-texture-light', bodyBg: 'bg-slate-950', controlsBg: 'bg-emerald-50' }
+        ];
+
+        let notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        let currentCategory = 'General';
+        let currentLang = localStorage.getItem(LANG_KEY) || 'en';
+        let currentThemeId = localStorage.getItem(THEME_KEY) || 'classic';
+        let currentFontSize = parseInt(localStorage.getItem(FONT_SIZE_KEY) || '16', 10);
+        let pinUnlocked = false;
+        let editingNoteId = null;
+        let saveActionCount = parseInt(localStorage.getItem(SAVE_COUNT_KEY) || '0', 10);
+
+        if (notes.length === 0) {
+            notes.push({
+                id: Date.now(),
+                title: "My First Diary Note",
+                content: "Welcome to Smart Diary! Your notes are 100% private and stored locally. You can switch languages anytime in Settings (☰).",
+                category: "Stories",
+                date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+            });
+            saveToStorage();
+        }
+
+        const noteTitle = document.getElementById('noteTitle');
+        const noteContent = document.getElementById('noteContent');
+        const notesList = document.getElementById('notesList');
+        const charCount = document.getElementById('charCount');
+        const savedCountMini = document.getElementById('savedCountMini');
+        const drawerNotesCount = document.getElementById('drawerNotesCount');
+        const searchQuery = document.getElementById('searchQuery');
+        const sideDrawer = document.getElementById('sideDrawer');
+        const drawerPanel = document.getElementById('drawerPanel');
+        const drawerPinStatus = document.getElementById('drawerPinStatus');
+        const headerLockIcon = document.getElementById('headerLockIcon');
+        const saveNoteBtn = document.getElementById('saveNoteBtn');
+        const saveBtnText = document.getElementById('saveBtnText');
+        const editingBanner = document.getElementById('editingBanner');
+        const editorBox = document.getElementById('editorBox');
+        const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+        const savedNotesModal = document.getElementById('savedNotesModal');
+        const interstitialModal = document.getElementById('interstitialModal');
+        const languageSelect = document.getElementById('languageSelect');
+
+        function changeFontSize(delta) {
+            currentFontSize = Math.min(26, Math.max(13, currentFontSize + delta));
+            localStorage.setItem(FONT_SIZE_KEY, currentFontSize.toString());
+            applyFontSize();
+        }
+
+        function applyFontSize() {
+            noteContent.style.fontSize = `${currentFontSize}px`;
+            noteContent.style.lineHeight = `${currentFontSize * 1.6}px`;
+            fontSizeDisplay.innerText = currentFontSize;
+        }
+
+        function cycleTheme() {
+            const currentIndex = themes.findIndex(t => t.id === currentThemeId);
+            const nextIndex = (currentIndex + 1) % themes.length;
+            currentThemeId = themes[nextIndex].id;
+            localStorage.setItem(THEME_KEY, currentThemeId);
+            applyTheme();
+        }
+
+        function applyTheme() {
+            const theme = themes.find(t => t.id === currentThemeId) || themes[0];
+            const appBody = document.getElementById('appBody');
+            const mainAppShell = document.getElementById('mainAppShell');
+            const appHeader = document.getElementById('appHeader');
+            const controlsBar = document.getElementById('controlsBar');
+            const drawerThemeName = document.getElementById('drawerThemeName');
+            const themeNameText = document.getElementById('themeNameText');
+
+            appBody.className = `${theme.bodyBg} font-sans min-h-screen flex justify-center transition-colors duration-300`;
+            mainAppShell.className = `w-full max-w-md ${theme.appBg} min-h-screen flex flex-col relative shadow-2xl overflow-hidden transition-colors duration-300`;
+            appHeader.className = `bg-gradient-to-r ${theme.headerBg} text-white px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-30`;
+            controlsBar.className = `px-3.5 py-2 ${theme.controlsBg} border-b ${theme.borderClass} flex items-center justify-between text-xs font-semibold gap-2 transition-colors duration-300`;
+
+            editorBox.className = `flex-1 ${theme.editorBg} rounded-2xl p-3.5 shadow-xs border ${theme.borderClass} flex flex-col relative transition-all duration-300`;
+
+            noteContent.classList.remove('notebook-texture-light', 'notebook-texture-dark', 'notebook-texture-sepia');
+            noteContent.classList.add(theme.texture);
+
+            if (theme.id === 'dark') {
+                noteTitle.classList.remove('text-slate-800');
+                noteTitle.classList.add('text-white');
+                noteContent.classList.remove('text-slate-800', 'text-stone-900', 'text-emerald-950');
+                noteContent.classList.add('text-slate-100');
+            } else {
+                noteTitle.classList.remove('text-white');
+                noteTitle.classList.add('text-slate-800');
+                noteContent.classList.remove('text-slate-100');
+                noteContent.classList.add(theme.textClass);
+            }
+
+            themeNameText.innerText = theme.name.split(' ')[0];
+            drawerThemeName.innerText = theme.name;
+        }
+
+        noteContent.addEventListener('input', updateCounts);
+        function updateCounts() {
+            const dict = i18n[currentLang] || i18n.en;
+            const text = noteContent.value;
+            const count = text.length;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            charCount.innerText = `${count} ${dict.charsWords.replace('{words}', words)}`;
+        }
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+            updateSavedCounters();
+        }
+
+        function updateSavedCounters() {
+            savedCountMini.innerText = notes.length;
+            drawerNotesCount.innerText = notes.length;
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.className = "cat-pill px-3 py-1 rounded-full bg-blue-600 text-white shadow-xs text-xs font-semibold";
+                } else {
+                    btn.className = "cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 text-xs font-semibold";
+                }
+            });
+
+            if (cat === 'Personal') {
+                const pin = localStorage.getItem(PIN_KEY);
+                if (pin && !pinUnlocked) {
+                    openPinModal();
+                }
+            }
+        }
+
+        function saveOrUpdateNote() {
+            const title = noteTitle.value.trim();
+            const content = noteContent.value.trim();
+            const dict = i18n[currentLang] || i18n.en;
+
+            if (!title && !content) return;
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString(currentLang === 'en' ? 'en-US' : (currentLang === 'te' ? 'te-IN' : 'hi-IN'), { day: 'numeric', month: 'short', year: 'numeric' });
+
+            if (editingNoteId !== null) {
+                const index = notes.findIndex(n => n.id === editingNoteId);
+                if (index !== -1) {
+                    notes[index].title = title || (currentLang === 'en' ? 'Untitled Note' : 'శీర్షిక లేని నోట్');
+                    notes[index].content = content;
+                    notes[index].date = dateStr + ` (${dict.editTag})`;
+                }
+                editingNoteId = null;
+            } else {
+                const newNote = {
+                    id: Date.now(),
+                    title: title || (currentLang === 'en' ? 'Untitled Note' : 'శీర్షిక లేని నోట్'),
+                    content: content,
+                    category: currentCategory,
+                    date: dateStr
+                };
+                notes.unshift(newNote);
+            }
+
+            saveToStorage();
+            clearCurrentEditor();
+            renderNotes();
+
+            saveActionCount++;
+            localStorage.setItem(SAVE_COUNT_KEY, saveActionCount.toString());
+            if (saveActionCount % 2 === 0) {
+                showInterstitialAd();
+            }
+        }
+
+        function showInterstitialAd() {
+            if (interstitialModal) interstitialModal.classList.remove('hidden');
+        }
+
+        function closeInterstitialAd() {
+            if (interstitialModal) interstitialModal.classList.add('hidden');
+        }
+
+        function openNoteToEdit(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            if (note.category === 'Personal' && localStorage.getItem(PIN_KEY) && !pinUnlocked) {
+                openPinModal();
+                return;
+            }
+
+            const dict = i18n[currentLang] || i18n.en;
+            editingNoteId = note.id;
+            noteTitle.value = note.title;
+            noteContent.value = note.content;
+            setCategory(note.category);
+
+            editingBanner.classList.remove('hidden');
+            saveNoteBtn.className = "w-full mt-2.5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-emerald-500/25 flex items-center justify-center gap-2 transition shrink-0";
+            saveBtnText.innerText = dict.updateBtn;
+            
+            updateCounts();
+            closeSavedNotesModal();
+            noteContent.focus();
+            noteContent.setSelectionRange(noteContent.value.length, noteContent.value.length);
+        }
+
+        function cancelEditing() {
+            editingNoteId = null;
+            clearCurrentEditor();
+        }
+
+        function clearCurrentEditor() {
+            const dict = i18n[currentLang] || i18n.en;
+            editingNoteId = null;
+            noteTitle.value = '';
+            noteContent.value = '';
+            updateCounts();
+            editingBanner.classList.add('hidden');
+            saveNoteBtn.className = "w-full mt-2.5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition shrink-0";
+            saveBtnText.innerText = dict.saveBtn;
+        }
+
+        function renderNotes() {
+            const dict = i18n[currentLang] || i18n.en;
+            const query = (searchQuery.value || '').toLowerCase();
+            notesList.innerHTML = '';
+            const pinSet = localStorage.getItem(PIN_KEY);
+
+            let filtered = notes.filter(n => {
+                return n.title.toLowerCase().includes(query) || n.content.toLowerCase().includes(query);
+            });
+
+            if (filtered.length === 0) {
+                notesList.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="ph-bold ph-notebook text-3xl mb-1 text-slate-300"></i>
+                        <p class="text-xs">${dict.noNotes}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(note => {
+                const isLocked = note.category === 'Personal' && pinSet && !pinUnlocked;
+                const isBeingEdited = note.id === editingNoteId;
+                const card = document.createElement('div');
+                card.className = `bg-white p-3 rounded-xl border ${isBeingEdited ? 'border-amber-400 ring-2 ring-amber-200' : 'border-slate-200'} shadow-2xs flex flex-col justify-between gap-1.5 transition-all hover:border-blue-400 cursor-pointer active:scale-[0.99]`;
+
+                card.innerHTML = `
+                    <div onclick="openNoteToEdit(${note.id})" class="flex items-start justify-between gap-2">
+                        <div class="overflow-hidden flex-1">
+                            <div class="flex items-center gap-1.5">
+                                <h4 class="font-bold text-xs text-slate-800 truncate">${escapeHtml(note.title)}</h4>
+                                <i class="ph-bold ph-pencil-simple text-blue-500 text-[11px]"></i>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed whitespace-pre-line">
+                                ${isLocked ? '🔒 ••••••••• (PIN Protected)' : escapeHtml(note.content)}
+                            </p>
+                        </div>
+                        <span class="text-[9px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${getCategoryBadge(note.category)}">
+                            ${note.category}
+                        </span>
+                    </div>
+
+                    <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                        <span class="text-[10px] font-medium text-slate-400">${note.date}</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="event.stopPropagation(); openNoteToEdit(${note.id})" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 transition flex items-center gap-1">
+                                <i class="ph-bold ph-pencil"></i>
+                                <span>${dict.editBtn}</span>
+                            </button>
+                            ${!isLocked ? `
+                                <button onclick="event.stopPropagation(); shareNote(${note.id})" class="text-slate-400 hover:text-emerald-600 p-1 transition" title="Share">
+                                    <i class="ph-bold ph-whatsapp-logo text-sm"></i>
+                                </button>
+                            ` : ''}
+                            <button onclick="event.stopPropagation(); deleteNote(${note.id})" class="text-slate-400 hover:text-rose-500 p-1 transition" title="Delete">
+                                <i class="ph-bold ph-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                notesList.appendChild(card);
+            });
+        }
+
+        function getCategoryBadge(cat) {
+            switch(cat) {
+                case 'Stories': return 'bg-indigo-50 text-indigo-600';
+                case 'Important': return 'bg-amber-50 text-amber-600';
+                case 'Personal': return 'bg-purple-50 text-purple-600';
+                default: return 'bg-blue-50 text-blue-600';
+            }
+        }
+
+        function deleteNote(id) {
+            if (editingNoteId === id) cancelEditing();
+            notes = notes.filter(n => n.id !== id);
+            saveToStorage();
+            renderNotes();
+        }
+
+        function shareNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+            const text = `*${note.title}*\n\n${note.content}\n\n_Shared via Smart Diary_`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function openSavedNotesModal() {
+            renderNotes();
+            savedNotesModal.classList.remove('hidden');
+        }
+
+        function closeSavedNotesModal() {
+            savedNotesModal.classList.add('hidden');
+        }
+
+        function openSideDrawer() {
+            sideDrawer.classList.remove('pointer-events-none', 'opacity-0');
+            drawerPanel.classList.remove('-translate-x-full');
+            updatePinBadges();
+        }
+
+        function closeSideDrawer() {
+            sideDrawer.classList.add('opacity-0');
+            drawerPanel.classList.add('-translate-x-full');
+            setTimeout(() => {
+                sideDrawer.classList.add('pointer-events-none');
+            }, 300);
+        }
+
+        const pinModal = document.getElementById('pinModal');
+        const pinInputField = document.getElementById('pinInputField');
+        const pinModalHeading = document.getElementById('pinModalHeading');
+        const pinModalSub = document.getElementById('pinModalSub');
+
+        function openPinModal() {
+            const dict = i18n[currentLang] || i18n.en;
+            const pin = localStorage.getItem(PIN_KEY);
+            pinInputField.value = '';
+            if (pin) {
+                pinModalHeading.innerText = dict.pinEnterHeading;
+                pinModalSub.innerText = dict.pinEnterSub;
+            } else {
+                pinModalHeading.innerText = dict.pinSetHeading;
+                pinModalSub.innerText = dict.pinSetSub;
+            }
+            pinModal.classList.remove('hidden');
+            pinInputField.focus();
+        }
+
+        function closePinModal() {
+            pinModal.classList.add('hidden');
+        }
+
+        function submitPinModal() {
+            const entered = pinInputField.value.trim();
+            const savedPin = localStorage.getItem(PIN_KEY);
+
+            if (!savedPin) {
+                if (entered.length === 4) {
+                    localStorage.setItem(PIN_KEY, entered);
+                    pinUnlocked = true;
+                    closePinModal();
+                    updatePinBadges();
+                    renderNotes();
+                }
+            } else {
+                if (entered === savedPin) {
+                    pinUnlocked = true;
+                    closePinModal();
+                    updatePinBadges();
+                    renderNotes();
+                } else {
+                    pinInputField.classList.add('border-rose-500');
+                    setTimeout(() => pinInputField.classList.remove('border-rose-500'), 1000);
+                }
+            }
+        }
+
+        function updatePinBadges() {
+            const hasPin = !!localStorage.getItem(PIN_KEY);
+            drawerPinStatus.innerText = hasPin ? (pinUnlocked ? "UNLOCKED" : "LOCKED") : "OFF";
+            drawerPinStatus.className = hasPin 
+                ? (pinUnlocked ? "text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-mono font-bold" : "text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-mono font-bold")
+                : "text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono";
+            
+            headerLockIcon.className = hasPin 
+                ? (pinUnlocked ? "ph-bold ph-lock-key-open text-base text-emerald-200" : "ph-bold ph-lock-key text-base text-amber-200") 
+                : "ph-bold ph-lock-key-open text-base";
+        }
+
+        function backupNotes() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(notes, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `Smart_Diary_Backup_${Date.now()}.json`);
+            dlAnchor.click();
+        }
+
+        function restoreNotes(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedNotes = JSON.parse(e.target.result);
+                    if (Array.isArray(importedNotes)) {
+                        notes = importedNotes;
+                        saveToStorage();
+                        renderNotes();
+                    }
+                } catch (err) {
+                    console.error("Invalid JSON");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            const dict = i18n[currentLang] || i18n.en;
+            if (confirm(dict.deleteConfirm)) {
+                notes = [];
+                saveToStorage();
+                clearCurrentEditor();
+                renderNotes();
+                closeSideDrawer();
+            }
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem(LANG_KEY, lang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const dict = i18n[currentLang] || i18n.en;
+            if (languageSelect) languageSelect.value = currentLang;
+
+            document.getElementById('headerSub').innerText = dict.headerSub;
+            document.getElementById('catGeneralText').innerText = dict.catGeneral;
+            document.getElementById('catStoriesText').innerText = dict.catStories;
+            document.getElementById('catImportantText').innerText = dict.catImportant;
+            document.getElementById('catPersonalText').innerText = dict.catPersonal;
+
+            noteTitle.placeholder = dict.titlePlaceholder;
+            noteContent.placeholder = dict.contentPlaceholder;
+            document.getElementById('saveBtnText').innerText = editingNoteId !== null ? dict.updateBtn : dict.saveBtn;
+            document.getElementById('clearBtnText').innerText = dict.newBtn;
+            document.getElementById('openVaultBtnText').innerHTML = `${dict.savedVaultBtn} (<span id="savedCountMini">${notes.length}</span>)`;
+            document.getElementById('editingBannerText').innerText = dict.editTag;
+
+            document.getElementById('savedModalHeading').innerText = dict.savedHeading;
+            document.getElementById('savedModalSub').innerText = dict.savedSub;
+            searchQuery.placeholder = dict.searchPlaceholder;
+            document.getElementById('closeSavedModalBtn').innerText = dict.closeModalBtn;
+
+            document.getElementById('drawerSettingsLabel').innerText = dict.drawerSettings;
+            document.getElementById('menuViewNotesText').innerText = dict.menuSaved;
+            document.getElementById('menuThemeText').innerText = dict.menuTheme;
+            document.getElementById('menuPinText').innerText = dict.menuPin;
+            document.getElementById('menuBackupText').innerText = dict.menuBackup;
+            document.getElementById('menuBackupSub').innerText = dict.menuBackupSub;
+            document.getElementById('menuRestoreText').innerText = dict.menuRestore;
+            document.getElementById('menuLanguageLabel').innerText = dict.menuLanguage;
+            document.getElementById('menuClearAllText').innerText = dict.menuClearAll;
+            document.getElementById('drawerFooterText').innerText = dict.drawerFooter;
+
+            document.getElementById('pinCancelBtn').innerText = dict.cancel;
+            document.getElementById('pinConfirmBtn').innerText = dict.confirm;
+
+            document.getElementById('adSponsoredLabel').innerText = dict.adSponsored;
+            document.getElementById('adContinueBtn').innerText = dict.adContinue;
+
+            updateCounts();
+            renderNotes();
+        }
+
+        function escapeHtml(str) {
+            return (str || '').replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '"': '&quot;' }[tag] || tag));
+        }
+
+        // IMMEDIATE INITIALIZATION
+        applyLanguage();
+        applyTheme();
+        applyFontSize();
+        updatePinBadges();
+        updateSavedCounters();
+    </script>
+</body>
+</html>
