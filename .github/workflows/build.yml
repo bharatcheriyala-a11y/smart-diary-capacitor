@@ -1,4 +1,4 @@
-name: Build Clean APK
+ame: Build Clean APK
 on: [push]
 jobs:
   build:
