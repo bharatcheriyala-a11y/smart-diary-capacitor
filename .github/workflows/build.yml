@@ -10,6 +10,16 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
+      - name: Force Replace Android App Icons
+        run: |
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
+          rm -f android/app/src/main/res/drawable/ic_launcher_foreground.xml
+          rm -f android/app/src/main/res/drawable-v24/ic_launcher_foreground.xml
+          for dir in android/app/src/main/res/mipmap-*; do
+            cp -f "assets/SmartDiary_Pro_Icon (1).png" "$dir/ic_launcher.png"
+            cp -f "assets/SmartDiary_Pro_Icon (1).png" "$dir/ic_launcher_round.png"
+            cp -f "assets/SmartDiary_Pro_Icon (1).png" "$dir/ic_launcher_foreground.png"
+          done
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
