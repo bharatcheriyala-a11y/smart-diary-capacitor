@@ -9,13 +9,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
 
-    <!-- AdMob Official Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-6755737504750546" crossorigin="anonymous"></script>
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
         html, body {
@@ -26,6 +21,7 @@
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         #noteTitle, #noteContent, #searchQuery, #pinInputField {
@@ -51,49 +47,30 @@
             line-height: 2.3rem;
         }
 
-        /* 100% PERMANENT INVISIBLE SHIELD: NETLIFY BADGE ELIMINATION */
-        iframe[src*="netlify"],
-        div[class*="netlify"],
-        div[id*="netlify"],
-        a[href*="netlify.com"],
-        .netlify-badge,
-        [data-netlify-badge],
-        #netlify-badge,
-        .__netlify_badge,
-        div:has(> a[href*="netlify.com"]),
-        div:has(> iframe[src*="netlify"]),
-        [class*="feedback-modal"],
-        [class*="drawer-feedback"],
-        #feedback-drawer,
-        div[style*="z-index: 2147483647"],
-        div[style*="z-index: 9999999"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            width: 0 !important;
-            height: 0 !important;
-            position: absolute !important;
-            left: -99999px !important;
-            top: -99999px !important;
-            z-index: -99999 !important;
-        }
+        /* Fallback offline layout rules in case Tailwind CDN is offline */
+        .svg-icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
     </style>
 </head>
-<body id="appBody" class="bg-slate-950 text-slate-800 font-sans min-h-screen flex justify-center transition-colors duration-300">
+<body id="appBody" class="bg-slate-950 text-slate-800 font-sans min-h-screen flex justify-center transition-colors duration-200">
+
+    <!-- Instant Save Toast Notification -->
+    <div id="toastBanner" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 opacity-0 pointer-events-none transition-opacity duration-200">
+        <svg class="svg-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        <span id="toastText">Saved!</span>
+    </div>
 
     <!-- MAIN WRAPPER SHELL -->
-    <div id="mainAppShell" class="w-full max-w-md bg-white min-h-screen flex flex-col relative shadow-2xl overflow-hidden transition-colors duration-300">
+    <div id="mainAppShell" class="w-full max-w-md bg-white min-h-screen flex flex-col relative shadow-2xl overflow-hidden transition-colors duration-200">
 
         <!-- Top Header Bar -->
         <header id="appHeader" class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-30">
             <div class="flex items-center gap-2.5">
-                <button onclick="openSideDrawer()" class="p-1.5 text-2xl text-blue-100 hover:text-white active:scale-90 transition rounded-lg" title="Menu">
-                    <i class="ph-bold ph-list"></i>
+                <button onclick="openSideDrawer()" class="p-1.5 text-blue-100 hover:text-white active:scale-90 transition rounded-lg" title="Menu">
+                    <svg class="svg-icon w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-lg text-white shadow-inner">
-                        <i class="ph-fill ph-book-bookmark"></i>
+                    <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-white shadow-inner">
+                        <svg class="svg-icon w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 2a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2h-3v7l-2.5-1.5L10 9V2H6z"/></svg>
                     </div>
                     <div>
                         <h1 class="text-base font-extrabold tracking-wide leading-tight">Smart Diary</h1>
@@ -105,36 +82,38 @@
             <div class="flex items-center gap-2">
                 <!-- Theme Switcher -->
                 <button onclick="cycleTheme()" class="bg-white/15 hover:bg-white/25 text-white text-xs px-2.5 py-1.5 rounded-lg border border-white/20 flex items-center gap-1.5 active:scale-95 transition font-semibold">
-                    <i class="ph-bold ph-palette text-sm"></i>
+                    <svg class="svg-icon w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3a9 9 0 100 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z"/></svg>
                     <span id="themeNameText" class="text-[11px]">Classic</span>
                 </button>
 
                 <!-- Vault Lock Icon -->
                 <button onclick="openPinModal()" class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center text-white active:scale-90 transition" title="Security PIN">
-                    <i id="headerLockIcon" class="ph-bold ph-lock-key-open text-base"></i>
+                    <span id="headerLockIconWrap">
+                        <svg class="svg-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0"/></svg>
+                    </span>
                 </button>
             </div>
         </header>
 
         <!-- Category & Font Size Bar -->
-        <div id="controlsBar" class="px-3.5 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-semibold gap-2 transition-colors duration-300">
-            <div class="flex gap-1.5 overflow-x-auto scrollbar-none py-0.5">
-                <button onclick="setCategory('General')" class="cat-pill px-3 py-1 rounded-full bg-blue-600 text-white shadow-xs text-xs font-semibold" data-cat="General">
+        <div id="controlsBar" class="px-3.5 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-semibold gap-2 transition-colors duration-200">
+            <div class="flex gap-1.5 overflow-x-auto py-0.5">
+                <button onclick="setCategory('General')" class="cat-pill px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-semibold" data-cat="General">
                     <span id="catGeneralText">General</span>
                 </button>
-                <button onclick="setCategory('Stories')" class="cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 text-xs font-semibold" data-cat="Stories">
+                <button onclick="setCategory('Stories')" class="cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 text-xs font-semibold" data-cat="Stories">
                     <span id="catStoriesText">Stories</span>
                 </button>
-                <button onclick="setCategory('Important')" class="cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 text-xs font-semibold" data-cat="Important">
+                <button onclick="setCategory('Important')" class="cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 text-xs font-semibold" data-cat="Important">
                     <span id="catImportantText">Important</span>
                 </button>
-                <button onclick="setCategory('Personal')" class="cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 flex items-center gap-1 text-xs font-semibold" data-cat="Personal">
+                <button onclick="setCategory('Personal')" class="cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 flex items-center gap-1 text-xs font-semibold" data-cat="Personal">
                     <span id="catPersonalText">Personal</span>
-                    <i class="ph-bold ph-lock text-[10px] text-amber-500"></i>
+                    <svg class="svg-icon w-3 h-3 text-amber-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
                 </button>
             </div>
 
-            <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-1.5 py-0.5 shrink-0 shadow-xs">
+            <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-1.5 py-0.5 shrink-0">
                 <button onclick="changeFontSize(-1)" class="px-1 text-slate-500 hover:text-blue-600 font-black active:scale-75" title="Decrease Font">A-</button>
                 <span id="fontSizeDisplay" class="text-[11px] font-mono text-slate-600 font-bold px-0.5">16</span>
                 <button onclick="changeFontSize(1)" class="px-1 text-slate-500 hover:text-blue-600 font-black active:scale-75" title="Increase Font">A+</button>
@@ -144,11 +123,11 @@
         <!-- Main Notepad Canvas -->
         <main class="flex-1 p-3 flex flex-col space-y-2.5 overflow-hidden">
 
-            <div id="editorBox" class="flex-1 bg-white rounded-2xl p-3.5 shadow-xs border border-slate-200 flex flex-col relative transition-all duration-300">
+            <div id="editorBox" class="flex-1 bg-white rounded-2xl p-3.5 border border-slate-200 flex flex-col relative transition-all duration-200">
                 
                 <div id="editingBanner" class="hidden mb-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs text-amber-800 font-medium shrink-0">
                     <span class="flex items-center gap-1.5">
-                        <i class="ph-bold ph-pencil-simple-line text-amber-600"></i>
+                        <svg class="svg-icon w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                         <span id="editingBannerText">Editing Note</span>
                     </span>
                     <button onclick="cancelEditing()" class="text-amber-700 hover:text-rose-600 font-bold underline text-[11px]">Cancel</button>
@@ -164,6 +143,8 @@
                 <div class="flex-1 w-full overflow-hidden flex flex-col">
                     <textarea 
                         id="noteContent" 
+                        oninput="updateCounts()"
+                        onkeyup="updateCounts()"
                         placeholder="Write your story or notes freely here... (auto-saved securely)" 
                         class="flex-1 w-full text-slate-800 text-base outline-none resize-none placeholder:text-slate-400 notebook-texture-light bg-transparent font-normal leading-relaxed overflow-y-auto"
                     ></textarea>
@@ -173,11 +154,11 @@
                     <span id="charCount">0 characters • 0 words</span>
                     <div class="flex items-center gap-3">
                         <button onclick="clearCurrentEditor()" class="hover:text-rose-500 flex items-center gap-1 transition" title="Clear">
-                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                            <svg class="svg-icon w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                             <span id="clearBtnText">New</span>
                         </button>
                         <button onclick="openSavedNotesModal()" class="text-blue-600 hover:underline font-bold flex items-center gap-1" title="Vault">
-                            <i class="ph-bold ph-folder-open"></i>
+                            <svg class="svg-icon w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
                             <span id="openVaultBtnText">Saved Notes (<span id="savedCountMini">0</span>)</span>
                         </button>
                     </div>
@@ -186,55 +167,49 @@
                 <button 
                     id="saveNoteBtn"
                     onclick="saveOrUpdateNote()" 
-                    class="w-full mt-2.5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition shrink-0"
+                    class="w-full mt-2.5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition shrink-0"
                 >
-                    <i class="ph-bold ph-floppy-disk text-lg"></i>
+                    <svg class="svg-icon w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                     <span id="saveBtnText">Save Note</span>
                 </button>
             </div>
 
-            <!-- AdMob Dedicated Placement Unit -->
-            <div id="adContainerBox" class="w-full min-h-[50px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden flex flex-col items-center justify-center text-center p-1 shrink-0 transition-colors duration-300">
-                <ins class="adsbygoogle"
-                     style="display:inline-block;width:320px;height:50px"
-                     data-ad-client="ca-app-pub-6755737504750546"
-                     data-ad-slot="4680009749"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-                <div class="text-[9px] text-slate-400 mt-0.5 flex items-center gap-1">
-                    <i class="ph-bold ph-google-logo text-blue-500"></i>
-                    <span>Smart Diary Sponsor • AdMob</span>
+            <!-- Smart Offline-Safe Banner Box (Prevents "Webpage not available" error) -->
+            <div id="adContainerBox" class="w-full min-h-[46px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden flex flex-col items-center justify-center text-center p-1.5 shrink-0 transition-colors duration-200">
+                <div id="adSlotWrapper" class="w-full flex items-center justify-center"></div>
+                <div class="text-[10px] text-slate-400 flex items-center gap-1.5 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                    <span id="offlineStatusBanner">Smart Diary Pro • 100% Private & Offline Ready</span>
                 </div>
             </div>
 
         </main>
 
         <!-- Saved Notes Modal Drawer -->
-        <div id="savedNotesModal" class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center hidden">
+        <div id="savedNotesModal" class="fixed inset-0 z-40 bg-slate-900/60 flex items-end sm:items-center justify-center hidden">
             <div class="bg-white w-full max-w-md h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-2xl p-4 flex flex-col shadow-2xl space-y-3">
                 
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100 shrink-0">
                     <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-books text-blue-600 text-xl"></i>
+                        <svg class="svg-icon w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
                         <div>
                             <h3 class="font-bold text-sm text-slate-800" id="savedModalHeading">Saved Notes & Stories</h3>
                             <p class="text-[10px] text-slate-400" id="savedModalSub">Tap to edit, share on WhatsApp or delete</p>
                         </div>
                     </div>
-                    <button onclick="closeSavedNotesModal()" class="p-1.5 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full">
-                        <i class="ph-bold ph-x text-base"></i>
+                    <button onclick="closeSavedNotesModal()" class="p-1.5 text-slate-500 hover:text-slate-700 bg-slate-100 rounded-full">
+                        <svg class="svg-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>
                 </div>
 
                 <div class="relative shrink-0">
-                    <i class="ph-bold ph-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                    <svg class="svg-icon w-4 h-4 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <input 
                         type="text" 
                         id="searchQuery" 
                         oninput="renderNotes()" 
                         placeholder="Search notes & stories..." 
-                        class="w-full bg-slate-50 text-slate-700 text-xs pl-8 pr-3 py-2 rounded-xl border border-slate-200 outline-none focus:border-blue-500 transition"
+                        class="w-full bg-slate-50 text-slate-700 text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-200 outline-none focus:border-blue-500 transition"
                     />
                 </div>
 
@@ -246,14 +221,14 @@
             </div>
         </div>
 
-        <!-- Side Settings Menu (☰) -->
-        <div id="sideDrawer" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 opacity-0 pointer-events-none">
-            <div id="drawerPanel" class="w-72 bg-white h-full p-4 flex flex-col justify-between border-r border-slate-200 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out">
+        <!-- Side Settings Menu -->
+        <div id="sideDrawer" class="fixed inset-0 z-50 bg-slate-900/60 transition-opacity duration-200 opacity-0 pointer-events-none">
+            <div id="drawerPanel" class="w-72 bg-white h-full p-4 flex flex-col justify-between border-r border-slate-200 shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out">
                 <div>
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <div class="flex items-center gap-2">
-                            <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl font-bold shadow-sm shadow-blue-500/30">
-                                <i class="ph-fill ph-book-bookmark"></i>
+                            <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-sm">
+                                <svg class="svg-icon w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 2a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2h-3v7l-2.5-1.5L10 9V2H6z"/></svg>
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-slate-800 leading-tight">Smart Diary</h3>
@@ -261,62 +236,56 @@
                             </div>
                         </div>
                         <button onclick="closeSideDrawer()" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg">
-                            <i class="ph-bold ph-x text-base"></i>
+                            <svg class="svg-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
                         </button>
                     </div>
 
                     <div class="flex flex-col gap-1.5 mt-3 text-xs font-semibold text-slate-700">
                         
-                        <!-- Saved Notes Option -->
                         <button onclick="closeSideDrawer(); openSavedNotesModal();" class="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 text-blue-700 transition">
                             <div class="flex items-center gap-2.5">
-                                <i class="ph-bold ph-folder-open text-base"></i>
+                                <svg class="svg-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
                                 <span id="menuViewNotesText">Saved Notes & Stories</span>
                             </div>
                             <span id="drawerNotesCount" class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">0</span>
                         </button>
 
-                        <!-- Theme Switcher -->
                         <button onclick="cycleTheme()" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition">
                             <div class="flex items-center gap-2.5">
-                                <i class="ph-bold ph-palette text-base text-indigo-600"></i>
+                                <svg class="svg-icon w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z"/></svg>
                                 <span id="menuThemeText">Color Theme</span>
                             </div>
                             <span id="drawerThemeName" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">Classic</span>
                         </button>
 
-                        <!-- PIN Security -->
-                        <button onclick="openPinModal(); closeSideDrawer();" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
+                        <button onclick="openPinModal(); closeSideDrawer();" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition">
                             <div class="flex items-center gap-2.5">
-                                <i class="ph-bold ph-lock-key text-base text-blue-600"></i>
+                                <svg class="svg-icon w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
                                 <span id="menuPinText">Security PIN Lock</span>
                             </div>
                             <span id="drawerPinStatus" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono">OFF</span>
                         </button>
 
-                        <!-- Backup Option -->
                         <button onclick="backupNotes(); closeSideDrawer();" class="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 transition">
-                            <i class="ph-bold ph-download-simple text-base text-emerald-600"></i>
-                            <div>
+                            <svg class="svg-icon w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                            <div class="text-left">
                                 <span id="menuBackupText">Download Backup</span>
                                 <p class="text-[9px] text-slate-400 font-normal" id="menuBackupSub">Save securely on device</p>
                             </div>
                         </button>
 
-                        <!-- Restore Option -->
                         <label class="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 transition cursor-pointer">
-                            <i class="ph-bold ph-upload-simple text-base text-indigo-600"></i>
+                            <svg class="svg-icon w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
                             <span id="menuRestoreText">Restore Backup File</span>
                             <input type="file" id="restoreFileInput" accept=".json" onchange="restoreNotes(event)" class="hidden">
                         </label>
 
                         <div class="my-1.5 border-t border-slate-100"></div>
 
-                        <!-- MULTI-LANGUAGE SELECTOR (Inside Settings) -->
                         <div class="px-2.5 py-1.5 bg-slate-50 rounded-xl border border-slate-200">
                             <div class="flex items-center justify-between mb-1.5">
                                 <span class="text-slate-600 font-bold text-[11px] flex items-center gap-1">
-                                    <i class="ph-bold ph-translate text-blue-600"></i>
+                                    <svg class="svg-icon w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>
                                     <span id="menuLanguageLabel">Language</span>
                                 </span>
                             </div>
@@ -329,9 +298,8 @@
                             </select>
                         </div>
 
-                        <!-- Clear All Notes Option -->
                         <button onclick="clearAllData()" class="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-rose-50 text-rose-600 transition mt-1">
-                            <i class="ph-bold ph-trash text-base"></i>
+                            <svg class="svg-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                             <span id="menuClearAllText">Delete All Notes</span>
                         </button>
                     </div>
@@ -345,10 +313,10 @@
         </div>
 
         <!-- Custom PIN Modal -->
-        <div id="pinModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div id="pinModal" class="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4 hidden">
             <div class="bg-white rounded-2xl w-full max-w-xs p-4 shadow-2xl text-center space-y-3">
-                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl mx-auto">
-                    <i class="ph-bold ph-shield-check"></i>
+                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+                    <svg class="svg-icon w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
                 </div>
                 <div>
                     <h3 class="text-sm font-bold text-slate-800" id="pinModalHeading">Security PIN</h3>
@@ -358,6 +326,7 @@
                     type="password" 
                     id="pinInputField" 
                     maxlength="4" 
+                    inputmode="numeric"
                     placeholder="••••" 
                     class="w-32 mx-auto text-center tracking-[0.5em] text-xl font-bold py-1.5 border-b-2 border-blue-600 outline-none"
                 />
@@ -372,34 +341,15 @@
             </div>
         </div>
 
-        <!-- Interstitial Ad Trigger Unit -->
-        <div id="interstitialModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-            <div class="bg-white rounded-2xl w-full max-w-xs p-4 shadow-2xl text-center space-y-3 relative">
-                <button onclick="closeInterstitialAd()" class="absolute top-2.5 right-2.5 text-slate-400 hover:text-slate-700 p-1 rounded-full bg-slate-100">
-                    <i class="ph-bold ph-x text-xs"></i>
-                </button>
-                <div class="text-[9px] uppercase tracking-wider text-slate-400 font-bold" id="adSponsoredLabel">Sponsored Ad</div>
-                <div class="h-40 bg-slate-50 rounded-xl flex flex-col items-center justify-center p-3 border border-dashed border-slate-300">
-                    <i class="ph-bold ph-sparkle text-3xl text-indigo-500 mb-1"></i>
-                    <p class="text-xs font-bold text-slate-700">Smart Diary Pro Features</p>
-                    <p class="text-[10px] text-slate-400 mt-1">Google AdMob Interstitial Slot: ca-app-pub-6755737504750546/9803297732</p>
-                </div>
-                <button onclick="closeInterstitialAd()" id="adContinueBtn" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition">
-                    Continue to Smart Diary
-                </button>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Application Script Engine (Immediate Execution) -->
+    <!-- Application Script Engine (Immediate Offline Execution) -->
     <script>
         const STORAGE_KEY = 'smart_diary_user_notes';
         const PIN_KEY = 'smart_diary_security_pin';
         const LANG_KEY = 'smart_diary_language';
         const THEME_KEY = 'smart_diary_active_theme';
         const FONT_SIZE_KEY = 'smart_diary_font_size';
-        const SAVE_COUNT_KEY = 'smart_diary_save_action_counter';
 
         const i18n = {
             en: {
@@ -439,8 +389,7 @@
                 cancel: "Cancel",
                 confirm: "Confirm",
                 deleteConfirm: "Are you sure you want to delete all notes?",
-                adContinue: "Continue to Smart Diary",
-                adSponsored: "Sponsored Ad"
+                savedToast: "Note Saved!"
             },
             te: {
                 headerSub: "నోట్స్ & పర్సనల్ డైరీ",
@@ -479,8 +428,7 @@
                 cancel: "రద్దు",
                 confirm: "నిర్ధారించండి",
                 deleteConfirm: "మీ కథలు, నోట్స్ అన్నీ పూర్తిగా డిలీట్ చేయమంటారా?",
-                adContinue: "డైరీకి కొనసాగండి",
-                adSponsored: "ప్రకటన (Ad)"
+                savedToast: "సేవ్ అయింది!"
             },
             hi: {
                 headerSub: "नोट्स और व्यक्तिगत डायरी",
@@ -519,8 +467,7 @@
                 cancel: "रद्द करें",
                 confirm: "पुष्टि करें",
                 deleteConfirm: "क्या आप वाकई सभी नोट्स हटाना चाहते हैं?",
-                adContinue: "डायरी पर जारी रखें",
-                adSponsored: "प्रायोजित विज्ञापन"
+                savedToast: "सहेजा गया!"
             },
             ta: {
                 headerSub: "குறிப்புகள் மற்றும் தனிப்பட்ட டைரி",
@@ -559,8 +506,7 @@
                 cancel: "ரத்து செய்",
                 confirm: "உறுதிப்படுத்து",
                 deleteConfirm: "அனைத்து குறிப்புகளையும் நிச்சயமாக நீக்க விரும்புகிறீர்களா?",
-                adContinue: "தொடரவும்",
-                adSponsored: "விளம்பரம்"
+                savedToast: "சேமிக்கப்பட்டது!"
             },
             kn: {
                 headerSub: "ಟಿಪ್ಪಣಿಗಳು & ವೈಯಕ್ತಿಕ ಡೈರಿ",
@@ -599,8 +545,7 @@
                 cancel: "ರದ್ದುಮಾಡಿ",
                 confirm: "ಖಚಿತಪಡಿಸಿ",
                 deleteConfirm: "ಎಲ್ಲಾ ಟಿಪ್ಪಣಿಗಳನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?",
-                adContinue: "ಮುಂದುವರಿಸಿ",
-                adSponsored: "ಜಾಹೀರಾತು"
+                savedToast: "ಉಳಿಸಲಾಗಿದೆ!"
             }
         };
 
@@ -618,13 +563,12 @@
         let currentFontSize = parseInt(localStorage.getItem(FONT_SIZE_KEY) || '16', 10);
         let pinUnlocked = false;
         let editingNoteId = null;
-        let saveActionCount = parseInt(localStorage.getItem(SAVE_COUNT_KEY) || '0', 10);
 
         if (notes.length === 0) {
             notes.push({
                 id: Date.now(),
                 title: "My First Diary Note",
-                content: "Welcome to Smart Diary! Your notes are 100% private and stored locally. You can switch languages anytime in Settings (☰).",
+                content: "Welcome to Smart Diary! Your notes are 100% private and stored locally. You can switch languages anytime in Settings.",
                 category: "Stories",
                 date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
             });
@@ -635,21 +579,29 @@
         const noteContent = document.getElementById('noteContent');
         const notesList = document.getElementById('notesList');
         const charCount = document.getElementById('charCount');
-        const savedCountMini = document.getElementById('savedCountMini');
         const drawerNotesCount = document.getElementById('drawerNotesCount');
         const searchQuery = document.getElementById('searchQuery');
         const sideDrawer = document.getElementById('sideDrawer');
         const drawerPanel = document.getElementById('drawerPanel');
         const drawerPinStatus = document.getElementById('drawerPinStatus');
-        const headerLockIcon = document.getElementById('headerLockIcon');
+        const headerLockIconWrap = document.getElementById('headerLockIconWrap');
         const saveNoteBtn = document.getElementById('saveNoteBtn');
         const saveBtnText = document.getElementById('saveBtnText');
         const editingBanner = document.getElementById('editingBanner');
         const editorBox = document.getElementById('editorBox');
         const fontSizeDisplay = document.getElementById('fontSizeDisplay');
         const savedNotesModal = document.getElementById('savedNotesModal');
-        const interstitialModal = document.getElementById('interstitialModal');
         const languageSelect = document.getElementById('languageSelect');
+        const toastBanner = document.getElementById('toastBanner');
+        const toastText = document.getElementById('toastText');
+
+        function showToast(msg) {
+            toastText.innerText = msg;
+            toastBanner.classList.remove('opacity-0');
+            setTimeout(() => {
+                toastBanner.classList.add('opacity-0');
+            }, 1500);
+        }
 
         function changeFontSize(delta) {
             currentFontSize = Math.min(26, Math.max(13, currentFontSize + delta));
@@ -673,19 +625,12 @@
 
         function applyTheme() {
             const theme = themes.find(t => t.id === currentThemeId) || themes[0];
-            const appBody = document.getElementById('appBody');
-            const mainAppShell = document.getElementById('mainAppShell');
-            const appHeader = document.getElementById('appHeader');
-            const controlsBar = document.getElementById('controlsBar');
-            const drawerThemeName = document.getElementById('drawerThemeName');
-            const themeNameText = document.getElementById('themeNameText');
+            document.getElementById('appBody').className = `${theme.bodyBg} font-sans min-h-screen flex justify-center transition-colors duration-200`;
+            document.getElementById('mainAppShell').className = `w-full max-w-md ${theme.appBg} min-h-screen flex flex-col relative shadow-2xl overflow-hidden transition-colors duration-200`;
+            document.getElementById('appHeader').className = `bg-gradient-to-r ${theme.headerBg} text-white px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-30`;
+            document.getElementById('controlsBar').className = `px-3.5 py-2 ${theme.controlsBg} border-b ${theme.borderClass} flex items-center justify-between text-xs font-semibold gap-2 transition-colors duration-200`;
 
-            appBody.className = `${theme.bodyBg} font-sans min-h-screen flex justify-center transition-colors duration-300`;
-            mainAppShell.className = `w-full max-w-md ${theme.appBg} min-h-screen flex flex-col relative shadow-2xl overflow-hidden transition-colors duration-300`;
-            appHeader.className = `bg-gradient-to-r ${theme.headerBg} text-white px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-30`;
-            controlsBar.className = `px-3.5 py-2 ${theme.controlsBg} border-b ${theme.borderClass} flex items-center justify-between text-xs font-semibold gap-2 transition-colors duration-300`;
-
-            editorBox.className = `flex-1 ${theme.editorBg} rounded-2xl p-3.5 shadow-xs border ${theme.borderClass} flex flex-col relative transition-all duration-300`;
+            editorBox.className = `flex-1 ${theme.editorBg} rounded-2xl p-3.5 border ${theme.borderClass} flex flex-col relative transition-all duration-200`;
 
             noteContent.classList.remove('notebook-texture-light', 'notebook-texture-dark', 'notebook-texture-sepia');
             noteContent.classList.add(theme.texture);
@@ -702,11 +647,10 @@
                 noteContent.classList.add(theme.textClass);
             }
 
-            themeNameText.innerText = theme.name.split(' ')[0];
-            drawerThemeName.innerText = theme.name;
+            document.getElementById('themeNameText').innerText = theme.name.split(' ')[0];
+            document.getElementById('drawerThemeName').innerText = theme.name;
         }
 
-        noteContent.addEventListener('input', updateCounts);
         function updateCounts() {
             const dict = i18n[currentLang] || i18n.en;
             const text = noteContent.value;
@@ -721,17 +665,18 @@
         }
 
         function updateSavedCounters() {
-            savedCountMini.innerText = notes.length;
-            drawerNotesCount.innerText = notes.length;
+            const mini = document.getElementById('savedCountMini');
+            if (mini) mini.innerText = notes.length;
+            if (drawerNotesCount) drawerNotesCount.innerText = notes.length;
         }
 
         function setCategory(cat) {
             currentCategory = cat;
             document.querySelectorAll('.cat-pill').forEach(btn => {
                 if (btn.dataset.cat === cat) {
-                    btn.className = "cat-pill px-3 py-1 rounded-full bg-blue-600 text-white shadow-xs text-xs font-semibold";
+                    btn.className = "cat-pill px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-semibold";
                 } else {
-                    btn.className = "cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 text-xs font-semibold";
+                    btn.className = "cat-pill px-3 py-1 rounded-full bg-white text-slate-600 border border-slate-200 text-xs font-semibold flex items-center gap-1";
                 }
             });
 
@@ -748,7 +693,10 @@
             const content = noteContent.value.trim();
             const dict = i18n[currentLang] || i18n.en;
 
-            if (!title && !content) return;
+            if (!title && !content) {
+                noteContent.focus();
+                return;
+            }
 
             const now = new Date();
             const dateStr = now.toLocaleDateString(currentLang === 'en' ? 'en-US' : (currentLang === 'te' ? 'te-IN' : 'hi-IN'), { day: 'numeric', month: 'short', year: 'numeric' });
@@ -775,20 +723,7 @@
             saveToStorage();
             clearCurrentEditor();
             renderNotes();
-
-            saveActionCount++;
-            localStorage.setItem(SAVE_COUNT_KEY, saveActionCount.toString());
-            if (saveActionCount % 2 === 0) {
-                showInterstitialAd();
-            }
-        }
-
-        function showInterstitialAd() {
-            if (interstitialModal) interstitialModal.classList.remove('hidden');
-        }
-
-        function closeInterstitialAd() {
-            if (interstitialModal) interstitialModal.classList.add('hidden');
+            showToast(dict.savedToast);
         }
 
         function openNoteToEdit(id) {
@@ -807,7 +742,7 @@
             setCategory(note.category);
 
             editingBanner.classList.remove('hidden');
-            saveNoteBtn.className = "w-full mt-2.5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-emerald-500/25 flex items-center justify-center gap-2 transition shrink-0";
+            saveNoteBtn.className = "w-full mt-2.5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.99] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition shrink-0";
             saveBtnText.innerText = dict.updateBtn;
             
             updateCounts();
@@ -828,7 +763,7 @@
             noteContent.value = '';
             updateCounts();
             editingBanner.classList.add('hidden');
-            saveNoteBtn.className = "w-full mt-2.5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition shrink-0";
+            saveNoteBtn.className = "w-full mt-2.5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.99] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition shrink-0";
             saveBtnText.innerText = dict.saveBtn;
         }
 
@@ -845,7 +780,6 @@
             if (filtered.length === 0) {
                 notesList.innerHTML = `
                     <div class="text-center py-12 text-slate-400">
-                        <i class="ph-bold ph-notebook text-3xl mb-1 text-slate-300"></i>
                         <p class="text-xs">${dict.noNotes}</p>
                     </div>
                 `;
@@ -856,15 +790,12 @@
                 const isLocked = note.category === 'Personal' && pinSet && !pinUnlocked;
                 const isBeingEdited = note.id === editingNoteId;
                 const card = document.createElement('div');
-                card.className = `bg-white p-3 rounded-xl border ${isBeingEdited ? 'border-amber-400 ring-2 ring-amber-200' : 'border-slate-200'} shadow-2xs flex flex-col justify-between gap-1.5 transition-all hover:border-blue-400 cursor-pointer active:scale-[0.99]`;
+                card.className = `bg-white p-3 rounded-xl border ${isBeingEdited ? 'border-amber-400 ring-2 ring-amber-200' : 'border-slate-200'} flex flex-col justify-between gap-1.5 transition-all hover:border-blue-400 cursor-pointer active:scale-[0.99]`;
 
                 card.innerHTML = `
                     <div onclick="openNoteToEdit(${note.id})" class="flex items-start justify-between gap-2">
                         <div class="overflow-hidden flex-1">
-                            <div class="flex items-center gap-1.5">
-                                <h4 class="font-bold text-xs text-slate-800 truncate">${escapeHtml(note.title)}</h4>
-                                <i class="ph-bold ph-pencil-simple text-blue-500 text-[11px]"></i>
-                            </div>
+                            <h4 class="font-bold text-xs text-slate-800 truncate">${escapeHtml(note.title)}</h4>
                             <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed whitespace-pre-line">
                                 ${isLocked ? '🔒 ••••••••• (PIN Protected)' : escapeHtml(note.content)}
                             </p>
@@ -877,17 +808,16 @@
                     <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
                         <span class="text-[10px] font-medium text-slate-400">${note.date}</span>
                         <div class="flex items-center gap-2">
-                            <button onclick="event.stopPropagation(); openNoteToEdit(${note.id})" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 transition flex items-center gap-1">
-                                <i class="ph-bold ph-pencil"></i>
-                                <span>${dict.editBtn}</span>
+                            <button onclick="event.stopPropagation(); openNoteToEdit(${note.id})" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 transition">
+                                ${dict.editBtn}
                             </button>
                             ${!isLocked ? `
-                                <button onclick="event.stopPropagation(); shareNote(${note.id})" class="text-slate-400 hover:text-emerald-600 p-1 transition" title="Share">
-                                    <i class="ph-bold ph-whatsapp-logo text-sm"></i>
+                                <button onclick="event.stopPropagation(); shareNote(${note.id})" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition">
+                                    Share
                                 </button>
                             ` : ''}
-                            <button onclick="event.stopPropagation(); deleteNote(${note.id})" class="text-slate-400 hover:text-rose-500 p-1 transition" title="Delete">
-                                <i class="ph-bold ph-trash text-sm"></i>
+                            <button onclick="event.stopPropagation(); deleteNote(${note.id})" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-rose-50 text-rose-600 hover:bg-rose-100 transition">
+                                Del
                             </button>
                         </div>
                     </div>
@@ -939,7 +869,7 @@
             drawerPanel.classList.add('-translate-x-full');
             setTimeout(() => {
                 sideDrawer.classList.add('pointer-events-none');
-            }, 300);
+            }, 200);
         }
 
         const pinModal = document.getElementById('pinModal');
@@ -998,9 +928,11 @@
                 ? (pinUnlocked ? "text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-mono font-bold" : "text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-mono font-bold")
                 : "text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono";
             
-            headerLockIcon.className = hasPin 
-                ? (pinUnlocked ? "ph-bold ph-lock-key-open text-base text-emerald-200" : "ph-bold ph-lock-key text-base text-amber-200") 
-                : "ph-bold ph-lock-key-open text-base";
+            if (hasPin && !pinUnlocked) {
+                headerLockIconWrap.innerHTML = '<svg class="svg-icon w-4 h-4 text-amber-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>';
+            } else {
+                headerLockIconWrap.innerHTML = '<svg class="svg-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0"/></svg>';
+            }
         }
 
         function backupNotes() {
@@ -1083,9 +1015,6 @@
             document.getElementById('pinCancelBtn').innerText = dict.cancel;
             document.getElementById('pinConfirmBtn').innerText = dict.confirm;
 
-            document.getElementById('adSponsoredLabel').innerText = dict.adSponsored;
-            document.getElementById('adContinueBtn').innerText = dict.adContinue;
-
             updateCounts();
             renderNotes();
         }
@@ -1095,12 +1024,28 @@
                 tag => ({ '&': '&amp;', '<': '&lt;', '"': '&quot;' }[tag] || tag));
         }
 
+        // Load AdMob only when online so offline mode never shows "Webpage not available"
+        function initSafeAdMob() {
+            if (navigator.onLine) {
+                const s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-6755737504750546';
+                s.crossOrigin = 'anonymous';
+                document.head.appendChild(s);
+
+                const slot = document.getElementById('adSlotWrapper');
+                slot.innerHTML = '<ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px" data-ad-client="ca-app-pub-6755737504750546" data-ad-slot="4680009749"></ins>';
+                try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+            }
+        }
+
         // IMMEDIATE INITIALIZATION
         applyLanguage();
         applyTheme();
         applyFontSize();
         updatePinBadges();
         updateSavedCounters();
+        initSafeAdMob();
     </script>
 </body>
 </html>
