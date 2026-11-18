@@ -10,7 +10,7 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
-      - name: Force Replace Android App Icons
+      - name: Force Replace Android App Icons & Splash Screen
         run: |
           ICON_FILE=$(find assets -maxdepth 1 -type f -name "*.png" | sort -r | head -n 1)
           echo "Using icon: $ICON_FILE"
@@ -22,6 +22,7 @@ jobs:
             cp -f "$ICON_FILE" "$dir/ic_launcher_round.png"
             cp -f "$ICON_FILE" "$dir/ic_launcher_foreground.png"
           done
+          find android/app/src/main/res -name "splash.png" -exec cp -f "$ICON_FILE" {} \;
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
