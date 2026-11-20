@@ -1,5 +1,9 @@
-{
+ {
   "appId": "com.smartdiary.app",
   "appName": "Smart Diary",
-  "webDir": "www"
+  "webDir": "www",
+  "server": {
+    "url":"https://bharatcheriyala-a11y.github.io/smart-diary-capacitor/www/",
+    "cleartext": true
+  }
 }
