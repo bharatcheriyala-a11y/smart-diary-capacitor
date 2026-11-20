@@ -10,19 +10,44 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
-      - name: Force Replace Android App Icons & Splash Screen
+      - name: Sync Capacitor Config & Web Assets
+        run: npx cap sync android
+      - name: Generate Proper Icons & Non-Stretched Splash Screens
         run: |
-          ICON_FILE=$(find assets -maxdepth 1 -type f -name "*.png" | sort -r | head -n 1)
-          echo "Using icon: $ICON_FILE"
+          pip install pillow
+          python3 - << 'EOF'
+          from PIL import Image
+          import glob, os
+
+          icons = sorted(glob.glob("assets/*.png"), reverse=True)
+          icon_path = icons[0]
+          print("Using icon:", icon_path)
+          icon = Image.open(icon_path).convert("RGBA")
+
+          # 1. Create clean 512x512 icon
+          sq = Image.new("RGBA", (512, 512), (255, 255, 255, 255))
+          ic_fit = icon.resize((460, 460), Image.LANCZOS)
+          sq.paste(ic_fit, (26, 26), ic_fit)
+          sq.save("assets/final_icon.png")
+
+          # 2. Generate properly proportioned splash screens (centered logo, zero stretching)
+          for sp in glob.glob("android/app/src/main/res/**/splash.png", recursive=True):
+              with Image.open(sp) as orig:
+                  w, h = orig.size
+              canvas = Image.new("RGBA", (w, h), (29, 78, 216, 255))
+              logo_size = int(min(w, h) * 0.34)
+              logo = icon.resize((logo_size, logo_size), Image.LANCZOS)
+              canvas.paste(logo, ((w - logo_size) // 2, (h - logo_size) // 2), logo)
+              canvas.save(sp)
+          EOF
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
           rm -f android/app/src/main/res/drawable/ic_launcher_foreground.xml
           rm -f android/app/src/main/res/drawable-v24/ic_launcher_foreground.xml
           for dir in android/app/src/main/res/mipmap-*; do
-            cp -f "$ICON_FILE" "$dir/ic_launcher.png"
-            cp -f "$ICON_FILE" "$dir/ic_launcher_round.png"
-            cp -f "$ICON_FILE" "$dir/ic_launcher_foreground.png"
+            cp -f "assets/final_icon.png" "$dir/ic_launcher.png"
+            cp -f "assets/final_icon.png" "$dir/ic_launcher_round.png"
+            cp -f "assets/final_icon.png" "$dir/ic_launcher_foreground.png"
           done
-          find android/app/src/main/res -name "splash.png" -exec cp -f "$ICON_FILE" {} \;
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
