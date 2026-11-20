@@ -14,23 +14,23 @@ jobs:
         run: npx cap sync android
       - name: Generate Proper Icons & Non-Stretched Splash Screens
         run: |
-          pip install pillow
+          sudo apt-get update && sudo apt-get install -y python3-pil
           python3 - << 'EOF'
           from PIL import Image
-          import glob, os
+          import glob
 
           icons = sorted(glob.glob("assets/*.png"), reverse=True)
           icon_path = icons[0]
           print("Using icon:", icon_path)
           icon = Image.open(icon_path).convert("RGBA")
 
-          # 1. Create clean 512x512 icon
+          # 1. Clean 512x512 App Icon
           sq = Image.new("RGBA", (512, 512), (255, 255, 255, 255))
           ic_fit = icon.resize((460, 460), Image.LANCZOS)
           sq.paste(ic_fit, (26, 26), ic_fit)
           sq.save("assets/final_icon.png")
 
-          # 2. Generate properly proportioned splash screens (centered logo, zero stretching)
+          # 2. Properly proportioned Splash Screens (zero stretching)
           for sp in glob.glob("android/app/src/main/res/**/splash.png", recursive=True):
               with Image.open(sp) as orig:
                   w, h = orig.size
